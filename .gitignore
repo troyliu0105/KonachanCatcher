@@ -99,3 +99,4 @@ build-iPhoneSimulator/
 .DS_Store
 .gitignore
 .idea/
+.byebug_history
