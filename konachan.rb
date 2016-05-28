@@ -13,7 +13,7 @@ class Konachan
         @save_dir = save_dir
         FileUtils.mkpath(@save_dir) if @save_dir.length
         @proxy = Net::HTTP.new(@base_url.host, @base_url.port, '127.0.0.1', 8118) # 使用Privoxy转换shadowscoks的Socks代理为http代理，BUG：无法使用Socks
-        @db = SQLite3::Database.new(@save_dir + 'data.db')
+        @db = SQLite3::Database.new(File.join(@save_dir, 'data.db'))
         @last_progress = ''
         if @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='post'").empty?
             creat_table = "CREATE TABLE posts(
