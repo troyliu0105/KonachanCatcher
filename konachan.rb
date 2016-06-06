@@ -99,7 +99,7 @@ class Konachan
         insert = "INSERT INTO posts values(
             ?,
             '#{post['id']}',
-            '#{post['tags'].gsub(/["]/, '')}',
+            '#{post['tags'].gsub(/["‘]/, '')}',
             '#{post['author']}',
             '#{post['source']}',
             '#{post['file_size']}',
