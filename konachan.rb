@@ -5,12 +5,14 @@ require 'byebug'
 require 'fileutils'
 
 class Konachan
-    def initialize(tag = nil, width = nil, height = nil, save_dir = '')
+    def initialize
         @base_url = URI.parse('http://konachan.com')
-        @tag = tag
-        @width = width
-        @height = height
-        @save_dir = save_dir
+        @config = get_config
+        @tag = @config['tag']
+        @rating = @config['rating']
+        @width = @config['width']
+        @height = @config['height']
+        @save_dir = @config['path']
         FileUtils.mkpath(@save_dir) if @save_dir.length
         @http = Net::HTTP.new(@base_url.host, @base_url.port)
         @db = SQLite3::Database.new(File.join(@save_dir, 'data.db'))
@@ -72,7 +74,7 @@ class Konachan
     def params(page)
         @hash = {}
         @hash[:page] = page
-        @hash[:tags] = "#{(@tag + ' ') unless @tag.nil?}#{('width:' + @width.to_s + '..') unless @width.nil?} #{('height:' + @height.to_s + '..') unless @height.nil?}"
+        @hash[:tags] = "#{(@tag + ' ') unless @tag.nil?}#{('width:' + @width.to_s + '.. ') unless @width.nil?}#{('height:' + @height.to_s + '.. ') unless @height.nil?}#{('rating:' + @rating) unless @rating.nil?}"
         @hash
     end
 
@@ -125,7 +127,11 @@ class Konachan
         @last_progress = "#{id}===>#{('%0.2f' % ((read.to_f / size.to_f) * 100))}%"
         print @last_progress
     end
+
+    def get_config
+        JSON.parse(open('./config.json', 'r').read)
+    end
 end
 
-konachan = Konachan.new(nil, 2560, 1600, '/Volumes/Data/Konachan')
+konachan = Konachan.new
 konachan.begin_task
