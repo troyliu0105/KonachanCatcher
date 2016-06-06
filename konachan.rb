@@ -12,7 +12,7 @@ class Konachan
         @height = height
         @save_dir = save_dir
         FileUtils.mkpath(@save_dir) if @save_dir.length
-        @proxy = Net::HTTP.new(@base_url.host, @base_url.port, '127.0.0.1', 8118) # 使用Privoxy转换shadowscoks的Socks代理为http代理，BUG：无法使用Socks
+        @http = Net::HTTP.new(@base_url.host, @base_url.port)
         @db = SQLite3::Database.new(File.join(@save_dir, 'data.db'))
         @last_progress = ''
         if @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='post'").empty?
@@ -37,7 +37,7 @@ class Konachan
         loop do
             post_url.query = URI.encode_www_form(params(current_index))
             request = Net::HTTP::Get.new(post_url)
-            response = @proxy.request(request)
+            response = @http.request(request)
             if response.class == Net::HTTPOK
                 body = response.body
                 reg = Regexp.new('^ *Post\\.register\\((\\{.*\\})\\)', Regexp::IGNORECASE)
@@ -78,7 +78,7 @@ class Konachan
 
     def download(id, url, name)
         request = Net::HTTP::Get.new url
-        @proxy.request request do |response|
+        @http.request request do |response|
             open(name, 'w') do |io|
                 file_size = response.content_length
                 has_read = 0
