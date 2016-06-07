@@ -51,12 +51,8 @@ class Konachan
                     file_name = "#{(@tag + '_' unless @tag.nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
                                 file_url[file_url.length - 4, file_url.length - 1]
                     id = post['id']
-                    dir = @tag.nil? ? 'images' : @tag
-                    if !@tag.nil? && !Dir.exist?(File.join(@save_dir, @tag))
-                        Dir.mkdir(File.join(@save_dir, @tag))
-                    elsif @tag.nil? && !Dir.exist?(File.join(@save_dir, 'images'))
-                        Dir.mkdir(File.join(@save_dir, 'images'))
-                    end
+                    dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
+                    Dir.mkdir dir unless Dir.exist?(dir)
                     file_name = File.join(@save_dir, dir, file_name)
                     download(id, file_url, file_name)
                 end
