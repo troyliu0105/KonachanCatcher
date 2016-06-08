@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'json'
 require 'sqlite3'
+require 'byebug'
 
 module Utils
     def configs
@@ -50,6 +51,14 @@ module Utils
         @last_progress = ''
     end
 
+    def downloaded?(id)
+        @downloaded_ids = get_all_downloaded_id if @downloaded_ids.nil?
+        downloaded = @downloaded_ids.include? id
+        puts downloaded
+        puts "#{id} downloaded, skip!" if downloaded
+        downloaded
+    end
+
     private
 
     def create_or_use_db
@@ -73,5 +82,12 @@ module Utils
     def mk_save_path
         path = configs['path']
         FileUtils.mkpath(path) if !path.nil? && !path.empty?
+    end
+
+    def get_all_downloaded_id
+        ids = []
+        result = @db.query 'SELECT id FROM posts'
+        result.each { |id| ids << id[0] }
+        ids
     end
 end

@@ -30,15 +30,16 @@ class Konachan
                 post_array = []
                 body.scan(reg) { |match| post_array.push JSON.parse(match[0]) }
                 post_array.each do |post|
-                    save_to_db post
+                    id = post['id']
+                    next if downloaded? id
                     file_url = post['file_url'].gsub(/^http:\/\/konachan\.com/, '')
                     file_name = "#{(@tag + '_' unless @tag.nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
                                 file_url[file_url.length - 4, file_url.length - 1]
-                    id = post['id']
                     dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
                     Dir.mkdir dir unless Dir.exist?(dir)
                     file_name = File.join(dir, file_name)
                     download(id, file_url, file_name)
+                    save_to_db post
                 end
             else
                 break
