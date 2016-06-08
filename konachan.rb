@@ -1,36 +1,20 @@
 require 'net/http'
-require 'json'
-require 'sqlite3'
 require 'byebug'
-require 'fileutils'
+
+require './utils'
 
 class Konachan
+    include Utils
+
     def initialize
         @base_url = URI.parse('http://konachan.com')
-        @config = get_config
-        @tag = @config['tag']
-        @rating = @config['rating']
-        @width = @config['width']
-        @height = @config['height']
-        @save_dir = @config['path']
-        FileUtils.mkpath(@save_dir) if @save_dir.length
+        @tag = configs['tag']
+        @rating = configs['rating']
+        @width = configs['width']
+        @height = configs['height']
+        @save_dir = configs['path']
         @http = Net::HTTP.new(@base_url.host, @base_url.port)
-        @db = SQLite3::Database.new(File.join(@save_dir, 'data.db'))
-        @last_progress = ''
-        if @db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='post'").empty?
-            creat_table = "CREATE TABLE posts(
-                _id INTEGER PRIMARY KEY NOT NULL,
-                id INTEGER NOT NULL,
-                tags TEXT,
-                author TEXT,
-                source TEXT,
-                size INTEGER,
-                url TEXT,
-                width INTEGER,
-                height INTEGER
-            )"
-            @db.execute creat_table
-        end
+        prepare
     end
 
     def begin_task
@@ -86,46 +70,10 @@ class Konachan
                     show_progress(id, file_size, has_read)
                     # debugger
                 end
-                print "\n"
-                @last_progress = ''
+                prepare_show_next_progress
                 io.close
             end
         end
-    end
-
-    def save_to_db(post)
-        insert = "INSERT INTO posts values(
-            ?,
-            '#{post['id']}',
-            '#{post['tags'].gsub(/["']/, '')}',
-            '#{post['author']}',
-            '#{post['source']}',
-            '#{post['file_size']}',
-            '#{post['file_url']}',
-            '#{post['width']}',
-            '#{post['height']}'
-        )" # 对tags进行去掉 “ 的操作，避免插入失败
-        begin
-            @db.execute insert
-        rescue Exception => e
-            puts e.message
-            puts e.backtrace.inspect, 'ERROR!'
-        end
-    end
-
-    def show_progress(id, size, read)
-        delete_back = ''
-        @last_progress.length.times do
-            delete_back += "\b"
-        end
-        # debugger
-        print delete_back
-        @last_progress = "#{id}===>#{('%0.2f' % ((read.to_f / size.to_f) * 100))}%"
-        print @last_progress
-    end
-
-    def get_config
-        JSON.parse(open('./config.json', 'r').read)
     end
 end
 
