@@ -17,7 +17,7 @@ class Konachan
         @http = Net::HTTP.new(@base_url.host, @base_url.port)
         @db = SQLite3::Database.new(File.join(@save_dir, 'data.db'))
         @last_progress = ''
-        if @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='post'").empty?
+        if @db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='post'").empty?
             creat_table = "CREATE TABLE posts(
                 _id INTEGER PRIMARY KEY NOT NULL,
                 id INTEGER NOT NULL,
