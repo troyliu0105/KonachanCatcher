@@ -53,7 +53,7 @@ class Konachan
                     id = post['id']
                     dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
                     Dir.mkdir dir unless Dir.exist?(dir)
-                    file_name = File.join(@save_dir, dir, file_name)
+                    file_name = File.join(@save_dir, file_name)
                     download(id, file_url, file_name)
                 end
             else
