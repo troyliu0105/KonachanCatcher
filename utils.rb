@@ -54,7 +54,6 @@ module Utils
     def downloaded?(id)
         @downloaded_ids = get_all_downloaded_id if @downloaded_ids.nil?
         downloaded = @downloaded_ids.include? id
-        puts downloaded
         puts "#{id} downloaded, skip!" if downloaded
         downloaded
     end
