@@ -1,6 +1,3 @@
-require 'net/http'
-require 'byebug'
-
 require './utils'
 
 class Konachan

@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'json'
+require 'net/http'
 require 'sqlite3'
 require 'byebug'
 
@@ -15,19 +16,22 @@ module Utils
     end
 
     def save_to_db(post)
+        thumb = get_thumb post
         insert = "INSERT INTO posts values(
             ?,
             '#{post['id']}',
+            ?,
             '#{post['tags'].gsub(/["']/, '')}',
-            '#{post['author']}',
-            '#{post['source']}',
+            '#{post['rating']}',
+            '#{post['width']}',
+            '#{post['height']}',
             '#{post['file_size']}',
             '#{post['file_url']}',
-            '#{post['width']}',
-            '#{post['height']}'
+            '#{post['author']}',
+            '#{post['source']}'
         )" # 对tags进行去掉 “ 的操作，避免插入失败
         begin
-            @db.execute insert
+            @db.execute insert, nil, thumb
         rescue Exception => e
             puts e.message
             e.backtrace.each { |line| puts "\t" + line }
@@ -66,13 +70,15 @@ module Utils
             creat_table = "CREATE TABLE posts(
                 _id INTEGER PRIMARY KEY NOT NULL,
                 id INTEGER NOT NULL UNIQUE,
+                thumb BLOB,
                 tags TEXT,
-                author TEXT,
-                source TEXT,
+                rating TEXT,
+                width INTEGER,
+                height INTEGER,
                 size INTEGER,
                 url TEXT,
-                width INTEGER,
-                height INTEGER
+                author TEXT,
+                source TEXT
             )"
             @db.execute creat_table
         end
@@ -88,5 +94,11 @@ module Utils
         result = @db.query 'SELECT id FROM posts'
         result.each { |id| ids << id[0] }
         ids
+    end
+
+    def get_thumb(post)
+        thumb_request = Net::HTTP::Get.new post['preview_url'].gsub(/^http:\/\/konachan\.com/, '')
+        thumb = @http.request thumb_request
+        SQLite3::Blob.new thumb.read_body
     end
 end
