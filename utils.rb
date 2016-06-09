@@ -65,7 +65,7 @@ module Utils
         if @db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='posts'")[0][0] == 0
             creat_table = "CREATE TABLE posts(
                 _id INTEGER PRIMARY KEY NOT NULL,
-                id INTEGER NOT NULL,
+                id INTEGER NOT NULL UNIQUE,
                 tags TEXT,
                 author TEXT,
                 source TEXT,
