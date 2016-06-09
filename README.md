@@ -17,6 +17,8 @@
 - `height`：大于此高度
 - `rating`：评级（ safe，questionable，explicit，questionableplus，questionableless）
 
+运行`proxychains ruby konachan.rb`来启动任务 (目前需要使用proxychains)
+
 ## Implementation
 
 首先对`http://konachan.com/post`提交搜索请求，再依次解析并下载每一页的壁纸。壁纸信息的插入是由类似如下的JavaScript代码插入。（相比直接解析HTML而言可以获得更多信息）
