@@ -3,7 +3,9 @@
     "width": 2650,
     "height": 1600,
     "rating": "safe",
-    "infoonly": false
+    "infoonly": false,
+    "proxyhost": "127.0.0.1",
+    "proxyport": 8118
 }
 /*SAFE = "safe"
 ECCHI = "questionable"
