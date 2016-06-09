@@ -17,21 +17,11 @@ module Utils
 
     def save_to_db(post)
         thumb = get_thumb post
-        insert = "INSERT INTO posts values(
-            ?,
-            '#{post['id']}',
-            ?,
-            '#{post['tags'].gsub(/["']/, '')}',
-            '#{post['rating']}',
-            '#{post['width']}',
-            '#{post['height']}',
-            '#{post['file_size']}',
-            '#{post['file_url']}',
-            '#{post['author']}',
-            '#{post['source']}'
-        )" # 对tags进行去掉 “ 的操作，避免插入失败
+        insert = 'INSERT INTO posts values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         begin
-            @db.execute insert, nil, thumb
+            @db.execute insert, nil, post['id'], thumb, post['tags'], post['rating'],
+                        post['width'], post['height'], post['file_size'],
+                        post['file_url'], post['author'], post['source']
         rescue Exception => e
             puts e.message
             e.backtrace.each { |line| puts "\t" + line }
@@ -68,7 +58,7 @@ module Utils
         @db = SQLite3::Database.new(File.join(configs['path'], 'data.db'))
         if @db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='posts'")[0][0] == 0
             creat_table = "CREATE TABLE posts(
-                _id INTEGER PRIMARY KEY NOT NULL,
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id INTEGER NOT NULL UNIQUE,
                 thumb BLOB,
                 tags TEXT,
