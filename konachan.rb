@@ -53,9 +53,9 @@ class Konachan
     private
 
     def params(page)
-        @hash = {}
+        @hash = {} if @hash.nil?
         @hash[:page] = page
-        @hash[:tags] = "#{(@tag + ' ') unless @tag.nil?}#{('width:' + @width.to_s + '.. ') unless @width.nil?}#{('height:' + @height.to_s + '.. ') unless @height.nil?}#{('rating:' + @rating) unless @rating.nil?}"
+        @hash[:tags] = "#{(@tag + ' ') unless @tag.nil?}#{('width:' + @width.to_s + '.. ') unless @width.nil?}#{('height:' + @height.to_s + '.. ') unless @height.nil?}#{('rating:' + @rating) unless @rating.nil?}" if @hash[:tags].nil?
         @hash
     end
 
