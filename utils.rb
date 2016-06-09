@@ -17,10 +17,10 @@ module Utils
 
     def save_to_db(post)
         thumb = get_thumb post
-        insert = 'INSERT INTO posts values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        insert = 'INSERT INTO posts values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         begin
             @db.execute insert, nil, post['id'], thumb, post['tags'], post['rating'],
-                        post['width'], post['height'], post['file_size'],
+                        post['score'], post['width'], post['height'], post['file_size'],
                         post['file_url'], post['author'], post['source']
         rescue Exception => e
             puts e.message
@@ -63,6 +63,7 @@ module Utils
                 thumb BLOB,
                 tags TEXT,
                 rating TEXT,
+                score INTEGER,
                 width INTEGER,
                 height INTEGER,
                 size INTEGER,
