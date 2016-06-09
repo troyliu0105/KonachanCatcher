@@ -27,15 +27,8 @@ class Konachan
                 post_array = []
                 body.scan(reg) { |match| post_array.push JSON.parse(match[0]) }
                 post_array.each do |post|
-                    id = post['id']
-                    next if downloaded? id
-                    file_url = post['file_url'].gsub(/^http:\/\/konachan\.com/, '')
-                    file_name = "#{(@tag + '_' unless @tag.nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
-                                file_url[file_url.length - 4, file_url.length - 1]
-                    dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
-                    Dir.mkdir dir unless Dir.exist?(dir)
-                    file_name = File.join(dir, file_name)
-                    download(id, file_url, file_name)
+                    next if downloaded? post['id']
+                    download post
                     save_to_db post
                 end
             else
@@ -56,17 +49,22 @@ class Konachan
         @hash
     end
 
-    def download(id, url, name)
+    def download(post)
+        file_url = post['file_url'].gsub(/^http:\/\/konachan\.com/, '')
+        file_name = "#{(@tag + '_' unless @tag.nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
+                    file_url[file_url.length - 4, file_url.length - 1]
+        dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
+        Dir.mkdir dir unless Dir.exist?(dir)
+        file_name = File.join(dir, file_name)
         request = Net::HTTP::Get.new url
         @http.request request do |response|
-            open(name, 'w') do |io|
+            open(file_name, 'w') do |io|
                 file_size = response.content_length
                 has_read = 0
                 response.read_body do |stream|
                     io.write stream
                     has_read += stream.size
-                    show_progress(id, file_size, has_read)
-                    # debugger
+                    show_progress(post['id'], file_size, has_read)
                 end
                 prepare_show_next_progress
                 io.close
