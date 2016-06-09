@@ -1,10 +1,10 @@
 {
-  "path":"/home/troy/data/images",
-  "width":2650,
-  "height":1600,
-  "rating":"safe"
+    "path": "/home/troy/data/images",
+    "width": 2650,
+    "height": 1600,
+    "rating": "safe",
+    "infoonly": false
 }
-
 /*SAFE = "safe"
 ECCHI = "questionable"
 HENTAI = "explicit"

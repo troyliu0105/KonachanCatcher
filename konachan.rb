@@ -28,7 +28,7 @@ class Konachan
                 body.scan(reg) { |match| post_array.push JSON.parse(match[0]) }
                 post_array.each do |post|
                     next if downloaded? post['id']
-                    download post
+                    download post unless configs['infoonly']
                     save_to_db post
                 end
             else
