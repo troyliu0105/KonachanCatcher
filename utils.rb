@@ -22,6 +22,7 @@ module Utils
             @db.execute insert, nil, post['id'], thumb, post['tags'], post['rating'],
                         post['score'], post['width'], post['height'], post['file_size'],
                         post['file_url'], post['author'], post['source']
+            puts "#{post['id']} saved into database"
         rescue Exception => e
             puts e.message
             e.backtrace.each { |line| puts "\t" + line }
