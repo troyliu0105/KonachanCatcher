@@ -57,7 +57,7 @@ class Konachan
 end
 
 konachan = Konachan.new
-if configs['from_db']
+if konachan.configs['from_db']
     konachan.begin_task_from_db
 else
     konachan.begin_task
