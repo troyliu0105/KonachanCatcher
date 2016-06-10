@@ -60,7 +60,7 @@ module Utils
                     file_url[file_url.length - 4, file_url.length - 1]
         dir = File.join(configs['path'], (configs['tag'].nil? ? 'images' : configs['tag']))
         Dir.mkdir dir unless Dir.exist?(dir)
-        file_name = File.join(dir, file_name)
+        file_name = File.join(dir, post['rating'], file_name)
         request = Net::HTTP::Get.new file_url
         @http.request request do |response|
             open(file_name, 'w') do |io|
