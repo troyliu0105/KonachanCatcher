@@ -17,7 +17,7 @@
 - `height`：大于此高度
 - `rating`：评级（ safe，questionable，explicit，questionableplus，questionableless）
 
-运行`proxychains ruby konachan.rb`来启动任务 (目前需要使用proxychains)
+运行`ruby konachan.rb`来启动任务 (有的地区可能需要制定代理或者直接使用proxychains)
 
 ## Implementation
 
