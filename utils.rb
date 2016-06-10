@@ -11,6 +11,7 @@ module Utils
     end
 
     def prepare
+        @http = Net::HTTP.new(@base_url.host, @base_url.port, configs['proxyhost'], configs['proxyport'])
         mk_save_path
         create_or_use_db
     end
@@ -53,10 +54,34 @@ module Utils
         downloaded
     end
 
+    def download(post)
+        file_url = (post['file_url'].nil? ? post['url'] : post['file_url']).gsub(/^http:\/\/konachan\.com/, '')
+        file_name = "#{(configs['tag'] + '_' unless configs['tag'].nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
+                    file_url[file_url.length - 4, file_url.length - 1]
+        dir = File.join(configs['path'], (configs['tag'].nil? ? 'images' : configs['tag']))
+        Dir.mkdir dir unless Dir.exist?(dir)
+        file_name = File.join(dir, file_name)
+        request = Net::HTTP::Get.new file_url
+        @http.request request do |response|
+            open(file_name, 'w') do |io|
+                file_size = response.content_length
+                has_read = 0
+                response.read_body do |stream|
+                    io.write stream
+                    has_read += stream.size
+                    show_progress(post['id'], file_size, has_read)
+                end
+                prepare_show_next_progress
+                io.close
+            end
+        end
+    end
+
     private
 
     def create_or_use_db
         @db = SQLite3::Database.new(File.join(configs['path'], 'data.db'))
+        @db.results_as_hash = true
         if @db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='posts'")[0][0] == 0
             creat_table = "CREATE TABLE posts(
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,

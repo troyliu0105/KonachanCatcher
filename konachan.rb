@@ -10,7 +10,6 @@ class Konachan
         @width = configs['width']
         @height = configs['height']
         @save_dir = configs['path']
-        @http = Net::HTTP.new(@base_url.host, @base_url.port, configs['proxyhost'], configs['proxyport'])
         prepare
     end
 
@@ -40,6 +39,13 @@ class Konachan
         @db.close
     end
 
+    def begin_task_from_db
+        result = @db.execute 'SELECT * FROM posts ORDER BY score DESC'
+        result.each do |post|
+            download post
+        end
+    end
+
     private
 
     def params(page)
@@ -48,30 +54,11 @@ class Konachan
         @hash[:tags] = "#{(@tag + ' ') unless @tag.nil?}#{('width:' + @width.to_s + '.. ') unless @width.nil?}#{('height:' + @height.to_s + '.. ') unless @height.nil?}#{('rating:' + @rating) unless @rating.nil?}" if @hash[:tags].nil?
         @hash
     end
-
-    def download(post)
-        file_url = post['file_url'].gsub(/^http:\/\/konachan\.com/, '')
-        file_name = "#{(@tag + '_' unless @tag.nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
-                    file_url[file_url.length - 4, file_url.length - 1]
-        dir = File.join(@save_dir, (@tag.nil? ? 'images' : @tag))
-        Dir.mkdir dir unless Dir.exist?(dir)
-        file_name = File.join(dir, file_name)
-        request = Net::HTTP::Get.new file_url
-        @http.request request do |response|
-            open(file_name, 'w') do |io|
-                file_size = response.content_length
-                has_read = 0
-                response.read_body do |stream|
-                    io.write stream
-                    has_read += stream.size
-                    show_progress(post['id'], file_size, has_read)
-                end
-                prepare_show_next_progress
-                io.close
-            end
-        end
-    end
 end
 
 konachan = Konachan.new
-konachan.begin_task
+if configs['from_db']
+    konachan.begin_task_from_db
+else
+    konachan.begin_task
+end
