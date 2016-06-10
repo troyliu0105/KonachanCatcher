@@ -58,9 +58,9 @@ module Utils
         file_url = (post['file_url'].nil? ? post['url'] : post['file_url']).gsub(/^http:\/\/konachan\.com/, '')
         file_name = "#{(configs['tag'] + '_' unless configs['tag'].nil?)}#{'id.' + post['id'].to_s}#{'_' + post['height'].to_s + 'x' + post['width'].to_s}" +
                     file_url[file_url.length - 4, file_url.length - 1]
-        dir = File.join(configs['path'], (configs['tag'].nil? ? 'images' : configs['tag']))
+        dir = File.join(configs['path'], (configs['tag'].nil? ? 'images' : configs['tag']), post['rating'])
         Dir.mkdir dir unless Dir.exist?(dir)
-        file_name = File.join(dir, post['rating'], file_name)
+        file_name = File.join(dir, file_name)
         request = Net::HTTP::Get.new file_url
         @http.request request do |response|
             open(file_name, 'w') do |io|
